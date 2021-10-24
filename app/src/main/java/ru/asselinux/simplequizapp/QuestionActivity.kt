@@ -38,6 +38,56 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
         btn_submit.setOnClickListener(this)
     }
 
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.tv_option_one -> {
+                selectedOptionView(tv_option_one, 1)
+            }
+            R.id.tv_option_two -> {
+                selectedOptionView(tv_option_two, 2)
+            }
+            R.id.tv_option_three -> {
+                selectedOptionView(tv_option_three,3)
+            }
+            R.id.tv_option_four -> {
+                selectedOptionView(tv_option_four, 4)
+            }
+            R.id.btn_submit -> {
+                if(mSelectedOptionPosition == 0) {
+                    mCurrentPosition++
+
+                    when {
+                        mCurrentPosition <= mQuestionsList!!.size -> {
+                            setQuestion()
+                        } else -> {
+                        val intent = Intent(this, ResultActivity::class.java)
+                        intent.putExtra(Constants.USER_NAME, mUserName)
+                        intent.putExtra(Constants.CORRECT_ANSWERS, mCorrentAnswers)
+                        intent.putExtra(Constants.TOTAL_QUESTIONS, mQuestionsList!!.size)
+                        startActivity(intent)
+                        finish()
+                    }
+                    }
+                } else {
+                    val question = mQuestionsList?.get(mCurrentPosition-1)
+                    if (question!!.correctAnswer != mSelectedOptionPosition) {
+                        answerView(mSelectedOptionPosition, R.drawable.wrong_option)
+                    } else {
+                        mCorrentAnswers++
+                    }
+                    answerView(question.correctAnswer, R.drawable.correct_option)
+
+                    if(mCurrentPosition == mQuestionsList!!.size) {
+                        btn_submit.text = "ГОТОВО"
+                    } else {
+                        btn_submit.text = "СЛЕДУЮЩИЙ ВОПРОС"
+                    }
+                    mSelectedOptionPosition = 0
+                }
+            }
+        }
+    }
+
     private fun setQuestion() {
         // mCurrentPosition = 1
         val question = mQuestionsList!![mCurrentPosition - 1]
@@ -52,7 +102,7 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
         progressBar.progress = mCurrentPosition
         tv_progress.text = "$mCurrentPosition" + "/" + progressBar.max
 
-        tv_question.text = question!!.question
+        tv_question.text = question.question
         iv_image.setImageResource(question.image)
         tv_option_one.text = question.optionOne
         tv_option_two.text = question.optionTwo
@@ -79,54 +129,7 @@ class QuestionActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    override fun onClick(v: View?) {
-        when (v?.id) {
-            R.id.tv_option_one -> {
-                selectedOptionView(tv_option_one, 1)
-            }
-            R.id.tv_option_two -> {
-                selectedOptionView(tv_option_two, 2)
-            }
-            R.id.tv_option_three -> {
-                selectedOptionView(tv_option_three,3)
-            }
-            R.id.tv_option_four -> {
-                selectedOptionView(tv_option_four, 4)
-            }
-            R.id.btn_submit -> {
-                if(mSelectedOptionPosition == 0) {
-                    mCurrentPosition++
 
-                    when {
-                        mCurrentPosition <= mQuestionsList!!.size -> {
-                            setQuestion()
-                        } else -> {
-                            val intent = Intent(this, ResultActivity::class.java)
-                            intent.putExtra(Constants.USER_NAME, mUserName)
-                            intent.putExtra(Constants.CORRECT_ANSWERS, mCorrentAnswers)
-                            intent.putExtra(Constants.TOTAL_QUESTIONS, mQuestionsList!!.size)
-                            startActivity(intent)
-                        }
-                    }
-                } else {
-                    val question = mQuestionsList?.get(mCurrentPosition-1)
-                    if (question!!.correctAnswer != mSelectedOptionPosition) {
-                        answerView(mSelectedOptionPosition, R.drawable.wrong_option)
-//                    } else {
-//                        mCorrentAnswers++
-                    }
-                        answerView(mSelectedOptionPosition, R.drawable.correct_option)
-
-                    if(mCurrentPosition == mQuestionsList!!.size) {
-                        btn_submit.text = "ГОТОВО"
-                    } else {
-                        btn_submit.text = "СЛЕДУЮЩИЙ ВОПРОС"
-                    }
-                    mSelectedOptionPosition = 0
-                }
-            }
-        }
-    }
 
     private fun answerView(answer: Int, drawableView: Int) {
         when (answer) {
